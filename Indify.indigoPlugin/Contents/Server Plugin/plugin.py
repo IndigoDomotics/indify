@@ -3,6 +3,7 @@
 ####################
 # Copyright (c) 2014, Perceptive Automation, LLC. All rights reserved.
 # http://www.indigodomo.com
+#version 1.0.2 - Private Beta
 
 import indigo
 import os, os.path
