@@ -5,7 +5,7 @@ Spotify plugin for Indigo
 
 Step 1:
 
-    a) Go to the following web address indify.ddns.net:8888
+    a) Go to the following web address http://indify.ddns.net:8888
     b) Follow directions to allow Indify to access your spotify data
     c) You will use the Spotify key and refresh key during device 
     
