@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<Actions>
+	<SupportURL>http://wiki.indigodomo.com/doku.php?id=plugins:example_dev_1</SupportURL>
+	<Action id="toggle" deviceFilter="self">
+		<Name>Toggle</Name>
+		<CallbackMethod>toggle</CallbackMethod>
+	</Action>
+	<Action id="play" deviceFilter="self">
+		<Name>Play</Name>
+		<CallbackMethod>play</CallbackMethod>
+	</Action>
+	<Action id="pause" deviceFilter="self">
+		<Name>Pause</Name>
+		<CallbackMethod>pause</CallbackMethod>
+	</Action>
+	<Action id="next" deviceFilter="self">
+		<Name>Next Track</Name>
+		<CallbackMethod>next</CallbackMethod>
+	</Action>
+	<Action id="previous" deviceFilter="self">
+		<Name>Previous Track</Name>
+		<CallbackMethod>previous</CallbackMethod>
+	</Action>
+	<Action id="repeat" deviceFilter="self">
+		<Name>Repeat Tracks</Name>
+		<CallbackMethod>repeat</CallbackMethod>
+	</Action>
+	<Action id="shuffle" deviceFilter="self">
+		<Name>Shuffle Tracks</Name>
+		<CallbackMethod>shuffle</CallbackMethod>
+	</Action>
+	<Action id="increasevoume" deviceFilter="self">
+		<Name>Increase Volume</Name>
+		<CallbackMethod>increasevolume</CallbackMethod>
+	</Action>
+	<Action id="decreasevoume" deviceFilter="self">
+		<Name>Decrease Volume</Name>
+		<CallbackMethod>decreasevolume</CallbackMethod>
+	</Action>
+
+	<Action id="loadplaylistpage" deviceFilter="self">
+		<Name>Load Playlist Page</Name>
+		<ConfigUI>
+			<Field id="pagenumber" type="textfield" defaultValue="Default Value">
+				<Label>Playlist Page:</Label>
+			</Field>
+		</ConfigUI>
+        <CallbackMethod>loadplaylistpage</CallbackMethod>
+    </Action>
+    <Action id="nextplaylistpage" deviceFilter="self">
+		<Name>Next Playlist Page</Name>
+		<CallbackMethod>nextplaylistpage</CallbackMethod>
+	</Action>
+    <Action id="previousplaylistpage" deviceFilter="self">
+		<Name>Previous Playlist Page</Name>
+		<CallbackMethod>previousplaylistpage</CallbackMethod>
+	</Action>
+
+	<Action id="selectplaylist" deviceFilter="self">
+		<Name>Select Playlist</Name>
+		<ConfigUI>
+			<Field id="selectedplaylist" type="menu">
+				<Label>Select Playlist:</Label>
+				<List>
+					<Option value="01">Playlist 1</Option>
+					<Option value="02">Playlist 2</Option>
+					<Option value="03">Playlist 3</Option>
+					<Option value="04">Playlist 4</Option>
+					<Option value="05">Playlist 5</Option>
+					<Option value="06">Playlist 6</Option>
+					<Option value="07">Playlist 7</Option>
+					<Option value="08">Playlist 8</Option>
+					<Option value="09">Playlist 9</Option>
+					<Option value="10">Playlist 10</Option>
+				</List>
+			</Field>
+		</ConfigUI>
+		<CallbackMethod>selectplaylist</CallbackMethod>
+	</Action>
+	<Action id="loadtracklist" deviceFilter="self">
+		<Name>Load Playlist Tracks</Name>
+		<ConfigUI>
+			<Field id="trackpagenumber" type="textfield" defaultValue="Default Value">
+				<Label>Tracks Page:</Label>
+			</Field>
+		</ConfigUI>
+        <CallbackMethod>loadtrackspage</CallbackMethod>
+    </Action>
+    <Action id="nexttrackspage" deviceFilter="self">
+		<Name>Next Tracks Page</Name>
+		<CallbackMethod>nexttrackspage</CallbackMethod>
+	</Action>
+    <Action id="previoustrackspage" deviceFilter="self">
+		<Name>Previous Tracks Page</Name>
+		<CallbackMethod>previoustrackspage</CallbackMethod>
+	</Action>
+	<Action id="playselectedplaylist" deviceFilter="self">
+		<Name>Play Selected Playlist</Name>
+		<CallbackMethod>playselectedplaylist</CallbackMethod>
+	</Action>
+
+
+	<Action id="playplaylist" deviceFilter="self">
+		<Name>Play Playlist</Name>
+		<ConfigUI>
+			<Field id="PlaySelectedPlaylist" type="menu">
+				<Label>Play Playlist:</Label>
+				<List>
+					<Option value="01">Playlist 1</Option>
+					<Option value="02">Playlist 2</Option>
+					<Option value="03">Playlist 3</Option>
+					<Option value="04">Playlist 4</Option>
+					<Option value="05">Playlist 5</Option>
+					<Option value="06">Playlist 6</Option>
+					<Option value="07">Playlist 7</Option>
+					<Option value="08">Playlist 8</Option>
+					<Option value="09">Playlist 9</Option>
+					<Option value="10">Playlist 10</Option>
+				</List>
+			</Field>
+		</ConfigUI>
+		<CallbackMethod>playplaylist</CallbackMethod>
+	</Action>
+</Actions>

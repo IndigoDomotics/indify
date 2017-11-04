@@ -1,0 +1,482 @@
+<?xml version="1.0"?>
+
+<Devices>
+	<Device type="custom" id="indify">
+		<Name>Indify</Name>
+		<ConfigUI>
+			<Field id="SpotifyKey" type="textfield">
+				<Label>Spotify User Key: </Label>
+			</Field>
+			<Field id="RefreshKey" type="textfield" >
+				<Label>Spotify Refresh Key: </Label>
+			</Field>
+
+			<Field id="validatespotify" type="button">
+				<Label></Label>
+				<Title>Validate Spotify ID</Title>
+				<CallbackMethod>validatespotifyid</CallbackMethod>
+			</Field>
+
+			<Field id="SpotifyDevice" type="menu">
+				<Label>Device:</Label>
+				<List class="self" method="getspotifydevices" dynamicReload="true"/>
+			</Field>
+
+			<Field type="menu" id="PlaylistsPerPage" defaultValue="10">
+			<Label>Playlists per Page: </Label>
+				<List>
+					<Option value="01">1</Option>
+					<Option value="02">2</Option>
+					<Option value="03">3</Option>
+					<Option value="04">4</Option>
+					<Option value="05">5</Option>
+					<Option value="06">6</Option>
+					<Option value="07">7</Option>
+					<Option value="08">8</Option>
+					<Option value="09">9</Option>
+					<Option value="10">10</Option>
+				</List>
+			</Field>
+			<Field type="menu" id="TracksPerPage" defaultValue="10">
+			<Label>Tracks per Page: </Label>
+				<List>
+					<Option value="01">1</Option>
+					<Option value="02">2</Option>
+					<Option value="03">3</Option>
+					<Option value="04">4</Option>
+					<Option value="05">5</Option>
+					<Option value="06">6</Option>
+					<Option value="07">7</Option>
+					<Option value="08">8</Option>
+					<Option value="09">9</Option>
+					<Option value="10">10</Option>
+				</List>
+			</Field>
+
+
+		</ConfigUI>
+		
+		<States>
+			<State id="state">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Indify State</TriggerLabel>
+				<ControlPageLabel>Indify State</ControlPageLabel>
+			</State>
+			<State id="repeat">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Repeat</TriggerLabel>
+				<ControlPageLabel>Repeat</ControlPageLabel>
+			</State>
+			<State id="shuffle">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Shuffle</TriggerLabel>
+				<ControlPageLabel>Shuffle</ControlPageLabel>
+			</State>
+			<State type="number" id="volume"  defaultValue="10">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Volume</TriggerLabel>
+				<ControlPageLabel>Volume</ControlPageLabel>
+			</State>
+
+
+			<State id="c_album">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Current Album</TriggerLabel>
+				<ControlPageLabel>Current Album</ControlPageLabel>
+			</State>
+			<State id="c_track">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Current Track</TriggerLabel>
+				<ControlPageLabel>Current Track</ControlPageLabel>
+			</State>
+			<State id="c_artist">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Current Artist</TriggerLabel>
+				<ControlPageLabel>Current Artist</ControlPageLabel>
+			</State>
+			<State id="c_album">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Current Album</TriggerLabel>
+				<ControlPageLabel>Current Album</ControlPageLabel>
+			</State>
+			<State id="c_track_id">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Current Track ID</TriggerLabel>
+				<ControlPageLabel>Current Track ID</ControlPageLabel>
+			</State>
+			<State id="c_album_id">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Current Album ID</TriggerLabel>
+				<ControlPageLabel>Current Album ID</ControlPageLabel>
+			</State>
+			<State id="c_artist_id">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Current Artist ID</TriggerLabel>
+				<ControlPageLabel>Current Artist ID</ControlPageLabel>
+			</State>
+			<State id="duration">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Duration</TriggerLabel>
+				<ControlPageLabel>Duration</ControlPageLabel>
+			</State>
+			<State id="timeremaining">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Time Remaining</TriggerLabel>
+				<ControlPageLabel>Time Remaining</ControlPageLabel>
+			</State>
+			<State id="durationtext">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Duration Text</TriggerLabel>
+				<ControlPageLabel>Duration Text</ControlPageLabel>
+			</State>
+			<State id="timeremainingtext">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Time Remaining Text</TriggerLabel>
+				<ControlPageLabel>Time Remaining Text</ControlPageLabel>
+			</State>
+
+			<State id="p_album">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Previous Album</TriggerLabel>
+				<ControlPageLabel>Previous Album</ControlPageLabel>
+			</State>
+			<State id="p_track">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Previous Track</TriggerLabel>
+				<ControlPageLabel>Previous Track</ControlPageLabel>
+			</State>
+			<State id="p_artist">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Previous Artist</TriggerLabel>
+				<ControlPageLabel>Previous Artist</ControlPageLabel>
+			</State>
+			<State id="p_album">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Previous Album</TriggerLabel>
+				<ControlPageLabel>Previous Album</ControlPageLabel>
+			</State>
+			<State id="p_track_id">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Previous Track ID</TriggerLabel>
+				<ControlPageLabel>Previous ID</ControlPageLabel>
+			</State>
+			<State id="p_album_id">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Previous Album ID</TriggerLabel>
+				<ControlPageLabel>Previous Album ID</ControlPageLabel>
+			</State>
+			<State id="p_artist_id">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Previous Artist ID</TriggerLabel>
+				<ControlPageLabel>Previous Artist ID</ControlPageLabel>
+			</State>
+
+
+			<State id="playlistpage">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Playlist Page</TriggerLabel>
+				<ControlPageLabel>Playlist Page</ControlPageLabel>
+			</State>
+			<State id="playlistpage">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Playlist Page</TriggerLabel>
+				<ControlPageLabel>Playlist Page</ControlPageLabel>
+			</State>
+			<State id="totalplaylists">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Total Playlists</TriggerLabel>
+				<ControlPageLabel>Total Playlists</ControlPageLabel>
+			</State>
+			<State id="playlist_1">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 1</TriggerLabel>
+				<ControlPageLabel>Playlist 1</ControlPageLabel>
+			</State>
+			<State id="playlist_2">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 2</TriggerLabel>
+				<ControlPageLabel>Playlist 2</ControlPageLabel>
+			</State>
+			<State id="playlist_3">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 3</TriggerLabel>
+				<ControlPageLabel>Playlist 3</ControlPageLabel>
+			</State>
+			<State id="playlist_4">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 4</TriggerLabel>
+				<ControlPageLabel>Playlist 4</ControlPageLabel>
+			</State>
+			<State id="playlist_5">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 5</TriggerLabel>
+				<ControlPageLabel>Playlist 5</ControlPageLabel>
+			</State>
+			<State id="playlist_6">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 6</TriggerLabel>
+				<ControlPageLabel>Playlist 6</ControlPageLabel>
+			</State>
+			<State id="playlist_7">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 7</TriggerLabel>
+				<ControlPageLabel>Playlist 7</ControlPageLabel>
+			</State>
+			<State id="playlist_8">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 8</TriggerLabel>
+				<ControlPageLabel>Playlist 8</ControlPageLabel>
+			</State>
+			<State id="playlist_9">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 9</TriggerLabel>
+				<ControlPageLabel>Playlist 9</ControlPageLabel>
+			</State>
+			<State id="playlist_10">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist 10</TriggerLabel>
+				<ControlPageLabel>Playlist 10</ControlPageLabel>
+			</State>
+
+			<State id="playlistid_1">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist ID 1</TriggerLabel>
+				<ControlPageLabel>Playlist ID 1</ControlPageLabel>
+			</State>
+			<State id="playlistid_2">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 2</TriggerLabel>
+				<ControlPageLabel>Playlist id 2</ControlPageLabel>
+			</State>
+			<State id="playlistid_3">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 3</TriggerLabel>
+				<ControlPageLabel>Playlist id 3</ControlPageLabel>
+			</State>
+			<State id="playlistid_4">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 4</TriggerLabel>
+				<ControlPageLabel>Playlist id 4</ControlPageLabel>
+			</State>
+			<State id="playlistid_5">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 5</TriggerLabel>
+				<ControlPageLabel>Playlist id 5</ControlPageLabel>
+			</State>
+			<State id="playlistid_6">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 6</TriggerLabel>
+				<ControlPageLabel>Playlist id 6</ControlPageLabel>
+			</State>
+			<State id="playlistid_7">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 7</TriggerLabel>
+				<ControlPageLabel>Playlist id 7</ControlPageLabel>
+			</State>
+			<State id="playlistid_8">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 8</TriggerLabel>
+				<ControlPageLabel>Playlist id 8</ControlPageLabel>
+			</State>
+			<State id="playlistid_9">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 9</TriggerLabel>
+				<ControlPageLabel>Playlist id 9</ControlPageLabel>
+			</State>
+			<State id="playlistid_10">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 10</TriggerLabel>
+				<ControlPageLabel>Playlist id 10</ControlPageLabel>
+			</State>
+			<State id="playlistuser_1">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist ID 1</TriggerLabel>
+				<ControlPageLabel>Playlist ID 1</ControlPageLabel>
+			</State>
+			<State id="playlistuser_2">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 2</TriggerLabel>
+				<ControlPageLabel>Playlist id 2</ControlPageLabel>
+			</State>
+			<State id="playlistuser_3">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 3</TriggerLabel>
+				<ControlPageLabel>Playlist id 3</ControlPageLabel>
+			</State>
+			<State id="playlistuser_4">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 4</TriggerLabel>
+				<ControlPageLabel>Playlist id 4</ControlPageLabel>
+			</State>
+			<State id="playlistuser_5">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 5</TriggerLabel>
+				<ControlPageLabel>Playlist id 5</ControlPageLabel>
+			</State>
+			<State id="playlistuser_6">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 6</TriggerLabel>
+				<ControlPageLabel>Playlist id 6</ControlPageLabel>
+			</State>
+			<State id="playlistuser_7">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 7</TriggerLabel>
+				<ControlPageLabel>Playlist id 7</ControlPageLabel>
+			</State>
+			<State id="playlistuser_8">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 8</TriggerLabel>
+				<ControlPageLabel>Playlist id 8</ControlPageLabel>
+			</State>
+			<State id="playlistuser_9">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 9</TriggerLabel>
+				<ControlPageLabel>Playlist id 9</ControlPageLabel>
+			</State>
+			<State id="playlistuser_10">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 10</TriggerLabel>
+				<ControlPageLabel>Playlist id 10</ControlPageLabel>
+			</State>
+
+
+			<State id="playlistname">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Selected Playlist Name</TriggerLabel>
+				<ControlPageLabel>Selected Playlist Name</ControlPageLabel>
+			</State>
+			<State id="playlistdescription">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Selected Playlist Description</TriggerLabel>
+				<ControlPageLabel>Selected Playlist Description</ControlPageLabel>
+			</State>
+			<State id="playlistid">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Selected Playlist ID</TriggerLabel>
+				<ControlPageLabel>Selected Playlist ID</ControlPageLabel>
+			</State>
+			<State id="playlistuserid">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Selected Playlist User ID</TriggerLabel>
+				<ControlPageLabel>Selected Playlist User ID</ControlPageLabel>
+			</State>
+
+
+			<State id="trackpage">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Track Page</TriggerLabel>
+				<ControlPageLabel>Track Page</ControlPageLabel>
+			</State>
+			<State id="totaltracks">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Total Tracks</TriggerLabel>
+				<ControlPageLabel>Total Tracks</ControlPageLabel>
+			</State>
+			<State id="trackname_1">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist ID 1</TriggerLabel>
+				<ControlPageLabel>Playlist ID 1</ControlPageLabel>
+			</State>
+			<State id="trackname_2">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 2</TriggerLabel>
+				<ControlPageLabel>Playlist id 2</ControlPageLabel>
+			</State>
+			<State id="trackname_3">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 3</TriggerLabel>
+				<ControlPageLabel>Playlist id 3</ControlPageLabel>
+			</State>
+			<State id="trackname_4">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 4</TriggerLabel>
+				<ControlPageLabel>Playlist id 4</ControlPageLabel>
+			</State>
+			<State id="trackname_5">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 5</TriggerLabel>
+				<ControlPageLabel>Playlist id 5</ControlPageLabel>
+			</State>
+			<State id="trackname_6">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 6</TriggerLabel>
+				<ControlPageLabel>Playlist id 6</ControlPageLabel>
+			</State>
+			<State id="trackname_7">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 7</TriggerLabel>
+				<ControlPageLabel>Playlist id 7</ControlPageLabel>
+			</State>
+			<State id="trackname_8">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 8</TriggerLabel>
+				<ControlPageLabel>Playlist id 8</ControlPageLabel>
+			</State>
+			<State id="trackname_9">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 9</TriggerLabel>
+				<ControlPageLabel>Playlist id 9</ControlPageLabel>
+			</State>
+			<State id="trackname_10">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 10</TriggerLabel>
+				<ControlPageLabel>Playlist id 10</ControlPageLabel>
+			</State>
+			<State id="trackartist_1">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist ID 1</TriggerLabel>
+				<ControlPageLabel>Playlist ID 1</ControlPageLabel>
+			</State>
+			<State id="trackartist_2">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 2</TriggerLabel>
+				<ControlPageLabel>Playlist id 2</ControlPageLabel>
+			</State>
+			<State id="trackartist_3">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 3</TriggerLabel>
+				<ControlPageLabel>Playlist id 3</ControlPageLabel>
+			</State>
+			<State id="trackartist_4">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 4</TriggerLabel>
+				<ControlPageLabel>Playlist id 4</ControlPageLabel>
+			</State>
+			<State id="trackartist_5">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 5</TriggerLabel>
+				<ControlPageLabel>Playlist id 5</ControlPageLabel>
+			</State>
+			<State id="trackartist_6">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 6</TriggerLabel>
+				<ControlPageLabel>Playlist id 6</ControlPageLabel>
+			</State>
+			<State id="trackartist_7">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 7</TriggerLabel>
+				<ControlPageLabel>Playlist id 7</ControlPageLabel>
+			</State>
+			<State id="trackartist_8">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 8</TriggerLabel>
+				<ControlPageLabel>Playlist id 8</ControlPageLabel>
+			</State>
+			<State id="trackartist_9">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 9</TriggerLabel>
+				<ControlPageLabel>Playlist id 9</ControlPageLabel>
+			</State>
+			<State id="trackartist_10">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Playlist id 10</TriggerLabel>
+				<ControlPageLabel>Playlist id 10</ControlPageLabel>
+			</State>
+
+
+
+		</States>
+		<UiDisplayStateId>state</UiDisplayStateId>
+	</Device>
+
+</Devices>
