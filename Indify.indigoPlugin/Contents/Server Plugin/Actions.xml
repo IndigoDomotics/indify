@@ -29,19 +29,39 @@
 		<Name>Shuffle Tracks</Name>
 		<CallbackMethod>shuffle</CallbackMethod>
 	</Action>
-	<Action id="increasevoume" deviceFilter="self">
+
+	<Action id="setvolume" deviceFilter="self">
+		<Name>Set Volume</Name>
+		<ConfigUI>
+			<Field id="setpercent" type="textfield" defaultValue="50">
+				<Label>Set to x%:</Label>
+			</Field>
+		</ConfigUI>
+		<CallbackMethod>setvolume</CallbackMethod>
+	</Action>
+	<Action id="increasevolume" deviceFilter="self">
 		<Name>Increase Volume</Name>
+		<ConfigUI>
+			<Field id="increasepercent" type="textfield" defaultValue="10">
+				<Label>Increase x%:</Label>
+			</Field>
+		</ConfigUI>
 		<CallbackMethod>increasevolume</CallbackMethod>
 	</Action>
-	<Action id="decreasevoume" deviceFilter="self">
+	<Action id="decreasevolume" deviceFilter="self">
 		<Name>Decrease Volume</Name>
+		<ConfigUI>
+			<Field id="decreasepercent" type="textfield" defaultValue="10">
+				<Label>Decrease x%:</Label>
+			</Field>
+		</ConfigUI>
 		<CallbackMethod>decreasevolume</CallbackMethod>
 	</Action>
 
 	<Action id="loadplaylistpage" deviceFilter="self">
 		<Name>Load Playlist Page</Name>
 		<ConfigUI>
-			<Field id="pagenumber" type="textfield" defaultValue="Default Value">
+			<Field id="pagenumber" type="textfield" defaultValue="1">
 				<Label>Playlist Page:</Label>
 			</Field>
 		</ConfigUI>
@@ -80,7 +100,7 @@
 	<Action id="loadtracklist" deviceFilter="self">
 		<Name>Load Playlist Tracks</Name>
 		<ConfigUI>
-			<Field id="trackpagenumber" type="textfield" defaultValue="Default Value">
+			<Field id="trackpagenumber" type="textfield" defaultValue="1">
 				<Label>Tracks Page:</Label>
 			</Field>
 		</ConfigUI>

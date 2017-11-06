@@ -23,6 +23,7 @@ import json
 # Global variable
 ########################################
 
+spotifydevice = ""
 
 ########################################
 # Custom procedures
@@ -33,7 +34,9 @@ def convertms(millis):
     minutes = (millis / (1000 * 60)) % 60
     return seconds, minutes
 
-def spotifydevices(device):
+def getspotifydevice(device):
+
+    spotifyid = ""
 
     try:
         spotifykey = device.pluginProps["SpotifyKey"]
@@ -77,10 +80,9 @@ def GetCurrentSong(spotifykey):
 
     response = requests.get(spotifyurl, headers=spotifyheader, timeout=(1, 6))
     # indigo.server.log(str(response))
-
     #indigo.server.log("resp:" + str(response.text))
 
-    if str(response) != "<Response [401]>":
+    if str(response) == "<Response [200]>":
         try:
             data = json.loads(response.text)
 
@@ -109,7 +111,7 @@ def GetCurrentSong(spotifykey):
                     'imagesmall': imagesmall['url']
                     }
         except Exception as errtxt:
-            indigo.server.log('error 95a:' + str(errtxt) + str(response))
+            indigo.server.log('error 95a:' + str(errtxt) + ":" + str(response))
 
     else:
         return False
@@ -205,9 +207,9 @@ def LoadPlayListPage(device, spotifykey, pagenumber, itemsperpage):
 
     spotifyurl = "https://api.spotify.com/v1/me/playlists"
     spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    spotifydata = {'limit': itemsperpage, 'offset': playlistpage}
+    spotifyparam = {'limit': itemsperpage, 'offset': playlistpage}
     playlistcounter = 0
-    response = requests.get(spotifyurl, headers=spotifyheader, params=spotifydata)
+    response = requests.get(spotifyurl, headers=spotifyheader, params=spotifyparam)
     # indigo.server.log(str(response))
 
     if str(response) != "<Response [401]>":
@@ -232,8 +234,8 @@ def LoadPlaylistDetail(device, spotifykey, userid, playlistid):
     # indigo.server.log("test")
     spotifyurl = "https://api.spotify.com/v1/users/" + userid + "/playlists/" + playlistid
     spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    spotifydata = {"fields": "name,description,id"}
-    response = requests.get(spotifyurl, headers=spotifyheader, params=spotifydata)
+    spotifyparam = {"fields": "name,description,id"}
+    response = requests.get(spotifyurl, headers=spotifyheader, params=spotifyparam)
 
     # indigo.server.log(spotifyurl)
     # indigo.server.log(str(response))
@@ -266,9 +268,9 @@ def LoadTrackPage(device, userid, playlistid, spotifykey, pagenumber, itemsperpa
 
     spotifyurl = "https://api.spotify.com/v1/users/" + userid + "/playlists/" + playlistid + "/tracks"
     spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    spotifydata = {'limit': itemsperpage, 'offset': trackpage}
+    spotifyparam = {'limit': itemsperpage, 'offset': trackpage}
     trackcounter = 0
-    response = requests.get(spotifyurl, headers=spotifyheader, params=spotifydata)
+    response = requests.get(spotifyurl, headers=spotifyheader, params=spotifyparam)
     # indigo.server.log(str(response))
 
     if str(response) != "<Response [401]>":
@@ -307,20 +309,20 @@ def GetPlayerState(spotifykey):
 def ChangeShuffle(spotifykey,shuffleaction):
     spotifyurl = "https://api.spotify.com/v1/me/player/shuffle"
     spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    spotifydata ={"state": shuffleaction}
-    response = requests.put(spotifyurl, headers=spotifyheader, params=spotifydata)
+    spotifyparam ={"state": shuffleaction}
+    response = requests.put(spotifyurl, headers=spotifyheader, params=spotifyparam)
 
 def ChangeRepeat(spotifykey,repeataction):
     spotifyurl = "https://api.spotify.com/v1/me/player/repeat"
     spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    spotifydata ={"state": repeataction}
-    response = requests.put(spotifyurl, headers=spotifyheader, params=spotifydata)
+    spotifyparam ={"state": repeataction}
+    response = requests.put(spotifyurl, headers=spotifyheader, params=spotifyparam)
 
 def SetVolume(spotifykey, newvolume):
     spotifyurl = "https://api.spotify.com/v1/me/player/volume"
     spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    spotifydata ={"volume_percent": newvolume}
-    response = requests.put(spotifyurl, headers=spotifyheader, params=spotifydata)
+    spotifyparam ={"volume_percent": newvolume}
+    response = requests.put(spotifyurl, headers=spotifyheader, params=spotifyparam)
 
 ########################################
 class Plugin(indigo.PluginBase):
@@ -367,6 +369,8 @@ class Plugin(indigo.PluginBase):
                     #########################################
 
                     state = device.states["state"]
+                    spotifydevice = getspotifydevice(device)
+
                     if state == "playing":
                         timeremaining = timeremaining - 1000
                         device.updateStateOnServer("timeremaining", value=timeremaining)
@@ -392,14 +396,19 @@ class Plugin(indigo.PluginBase):
                         try:
                             if not playerstate == False:
                                 if int(playerstate['spotifyvolume']) != int(device.states["volume"]):
-                                    newvolume=int(device.states["volume"])
-                                    SetVolume(spotifykey, newvolume)
+                                    device.updateStateOnServer("volume", playerstate['spotifyvolume'])
 
                                 if playerstate['repeat'] != device.states["repeat"]:
-                                    ChangeRepeat(spotifykey, device.states["repeat"])
+                                    if device.states["repeat"] == "off":
+                                        device.updateStateOnServer("repeat", value="context")
+                                    else:
+                                        device.updateStateOnServer("repeat", value="off")
 
                                 if str(playerstate['shuffle']) != str(device.states["shuffle"]):
-                                    ChangeShuffle(spotifykey, device.states["shuffle"])
+                                    if str(device.states["shuffle"]) == "False":
+                                        device.updateStateOnServer("shuffle", value="True")
+                                    else:
+                                        device.updateStateOnServer("shuffle", value="False")
 
                         except Exception as errtxt:
                             indigo.server.log('error 90:' + str(errtxt))
@@ -470,12 +479,12 @@ class Plugin(indigo.PluginBase):
         device = indigo.devices[pluginAction.deviceId]
         spotifykey = device.pluginProps["SpotifyKey"]
         state = device.states["state"]
-        spotifydevice = spotifydevices(device)
+        spotifydevice = getspotifydevice(device)
 
         if state == "playing":
             spotifyurl = "https://api.spotify.com/v1/me/player/pause"
-            spotifydata = {"Authorization": "Bearer " + spotifykey}
-            response = requests.put(spotifyurl, headers=spotifydata)
+            spotifyheader = {"Authorization": "Bearer " + spotifykey}
+            response = requests.put(spotifyurl, headers=spotifyheader)
             device.updateStateOnServer("state", value="paused")
             ### check response
         else:
@@ -495,7 +504,7 @@ class Plugin(indigo.PluginBase):
 
         device = indigo.devices[pluginAction.deviceId]
         spotifykey = device.pluginProps["SpotifyKey"]
-        spotifydevice = spotifydevices(device)
+        spotifydevice = getspotifydevice(device)
 
         spotifyurl = "https://api.spotify.com/v1/me/player"
         spotifyheader = {"Authorization": "Bearer " + spotifykey}
@@ -510,10 +519,9 @@ class Plugin(indigo.PluginBase):
     def pause(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
         spotifykey = device.pluginProps["SpotifyKey"]
-
         spotifyurl = "https://api.spotify.com/v1/me/player/pause"
-        spotifydata = {"Authorization": "Bearer " + spotifykey}
-        response = requests.put(spotifyurl, headers=spotifydata)
+        spotifyheader = {"Authorization": "Bearer " + spotifykey}
+        response = requests.put(spotifyurl, headers=spotifyheader)
         device.updateStateOnServer("state", value="paused")
 
     #### check response
@@ -524,8 +532,8 @@ class Plugin(indigo.PluginBase):
         state = device.states["state"]
         if state == "playing":
             spotifyurl = "https://api.spotify.com/v1/me/player/next"
-            spotifydata = {"Authorization": "Bearer " + spotifykey}
-            response = requests.post(spotifyurl, headers=spotifydata)
+            spotifyheader = {"Authorization": "Bearer " + spotifykey}
+            response = requests.post(spotifyurl, headers=spotifyheader)
             indigo.server.log(str(response))
         ### check response
 
@@ -535,41 +543,58 @@ class Plugin(indigo.PluginBase):
         state = device.states["state"]
         if state == "playing":
             spotifyurl = "https://api.spotify.com/v1/me/player/previous"
-            spotifydata = {"Authorization": "Bearer " + spotifykey}
-            response = requests.post(spotifyurl, headers=spotifydata)
+            spotifyheader = {"Authorization": "Bearer " + spotifykey}
+            response = requests.post(spotifyurl, headers=spotifyheader)
             indigo.server.log(str(response))
         ### check response
 
     def repeat(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
+        spotifykey = device.pluginProps["SpotifyKey"]
         repeat = device.states["repeat"]
         if repeat == "off":
             device.updateStateOnServer("repeat", value="context")
+            ChangeRepeat(spotifykey, "context")
         else:
             device.updateStateOnServer("repeat", value="off")
+            ChangeRepeat(spotifykey, "off")
 
     def shuffle(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
+        spotifykey = device.pluginProps["SpotifyKey"]
         shuffle = device.states["shuffle"]
         if shuffle == "False":
             device.updateStateOnServer("shuffle", value="True")
+            ChangeShuffle(spotifykey, "True")
         else:
             device.updateStateOnServer("shuffle", value="False")
+            ChangeShuffle(spotifykey, "False")
+
+    def setvolume(self, pluginAction):
+        device = indigo.devices[pluginAction.deviceId]
+        spotifykey = device.pluginProps["SpotifyKey"]
+        newvolume = int(pluginAction.props["setpercent"])
+        SetVolume(spotifykey, newvolume)
+        device.updateStateOnServer("volume", value=newvolume)
 
     def increasevolume(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
+        spotifykey = device.pluginProps["SpotifyKey"]
         oldvolume = int(device.states['volume'])
-        indigo.server.log(str(oldvolume))
+        increasepercent = int(pluginAction.props["increasepercent"])
         if int(oldvolume) < 100:
-            newvolume=oldvolume+10
-            indigo.server.log(str(newvolume))
+            newvolume=oldvolume+increasepercent
+            SetVolume(spotifykey, newvolume)
             device.updateStateOnServer("volume", value=newvolume)
 
     def decreasevolume(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
+        spotifykey = device.pluginProps["SpotifyKey"]
         oldvolume = device.states['volume']
+        decreasepercent = int(pluginAction.props["decreasepercent"])
         if int(oldvolume) > 0:
-            newvolume=oldvolume -10
+            newvolume=oldvolume - decreasepercent
+            SetVolume(spotifykey, newvolume)
             device.updateStateOnServer("volume", value=newvolume)
 
     def loadplaylistpage(self, pluginAction):
@@ -651,6 +676,7 @@ class Plugin(indigo.PluginBase):
         spotifyheader = {"Authorization": "Bearer " + spotifykey}
         spotifydata = {"context_uri": "spotify:user:" + device.states["playlistuserid"] + ":playlist:" + device.states["playlistid"]}
         json_string = json.dumps(spotifydata)
+
         response = requests.put(spotifyurl, headers=spotifyheader, data=json_string)
         indigo.server.log(str(response.url))
         indigo.server.log(str(response.text))
@@ -672,6 +698,7 @@ class Plugin(indigo.PluginBase):
         spotifyheader = {"Authorization": "Bearer " + spotifykey}
         spotifydata = {"context_uri": "spotify:user:" + playlistuser + ":playlist:" + playlistid, "device_ids": [spotifydevice]}
         json_string = json.dumps(spotifydata)
+
         response = requests.put(spotifyurl, headers=spotifyheader, data=json_string)
         indigo.server.log(str(response.url))
         indigo.server.log(str(response.text))
