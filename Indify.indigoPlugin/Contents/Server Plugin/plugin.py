@@ -122,6 +122,7 @@ def callspotifycommand(callid, device, type, spotifyurl, spotifydata=None, spoti
 #001
 def getspotifydevice(device):
     deviceid = "Device Not Found"
+    restricted = "true"
     response = callspotifycommand("001", device, "get", "https://api.spotify.com/v1/me/player/devices")
 
     if response != "Error":
@@ -130,8 +131,16 @@ def getspotifydevice(device):
         for spotifydevices in data['devices']:
             if spotifydevices['name'] == spotifydevice:
                 deviceid = (spotifydevices['id'])
+                restricted = (spotifydevices['is_restricted'])
 
     return deviceid
+
+    #if str(restricted) == "true":
+        #return deviceid
+    #else:
+        #indigo.server.log("error 001.5: Device not available")
+        #device.updateStateOnServer("state", value="unavailable")
+        #return "Unavailable"
 
 #002
 def RefreshKey(device, refreshkey):
