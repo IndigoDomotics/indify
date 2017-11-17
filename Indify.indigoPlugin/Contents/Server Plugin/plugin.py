@@ -313,12 +313,6 @@ def LoadPlayListPage(device, spotifykey, pagenumber, itemsperpage):
 
     response = callspotifycommand("007", device, "get", "https://api.spotify.com/v1/me/playlists", "", {'limit': itemsperpage, 'offset': playlistpage})
 
-    #spotifyurl = "https://api.spotify.com/v1/me/playlists"
-    #spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    #spotifyparam = {'limit': itemsperpage, 'offset': playlistpage}
-    #response = requests.get(spotifyurl, headers=spotifyheader, params=spotifyparam)
-    # indigo.server.log(str(response))
-
     if response != "Error":
         data = json.loads(response)
         device.updateStateOnServer("totalplaylists", value=data['total'])
@@ -359,14 +353,6 @@ def LoadPlaylistDetail(device, spotifykey, userid, playlistid):
 
     response = callspotifycommand("008", device, "get", "https://api.spotify.com/v1/users/" + userid + "/playlists/" + playlistid, "", {"fields": "name,description,id"})
 
-    #spotifyurl = "https://api.spotify.com/v1/users/" + userid + "/playlists/" + playlistid
-    #spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    #spotifyparam = {"fields": "name,description,id"}
-    #response = requests.get(spotifyurl, headers=spotifyheader, params=spotifyparam)
-
-    # indigo.server.log(spotifyurl)
-    # indigo.server.log(str(response))
-
     if response != "Error":
         data = json.loads(response)
         device.updateStateOnServer("playlistname", value=data['name'])
@@ -394,19 +380,12 @@ def LoadTrackPage(device, userid, playlistid, spotifykey, pagenumber, itemsperpa
     trackpage = ((pagenumber - 1) * itemsperpage) + 1
     trackcounter = 0
 
-    #spotifyurl = "https://api.spotify.com/v1/users/" + userid + "/playlists/" + playlistid + "/tracks"
-    #spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    #spotifyparam = {'limit': itemsperpage, 'offset': trackpage}
-    #response = requests.get(spotifyurl, headers=spotifyheader, params=spotifyparam)
-    # indigo.server.log(str(response))
-
     response = callspotifycommand("010", device, "get", "https://api.spotify.com/v1/users/" + userid + "/playlists/" + playlistid + "/tracks", "", {'limit': itemsperpage, 'offset': trackpage})
 
     if response != "Error":
         data = json.loads(response)
         device.updateStateOnServer("totaltracks", value=data['total'])
 
-        indigo.server.log(str(len(data['items'])))
         if len(data['items']) > 0:
             for trackcounter in range(1, 11):
                 device.updateStateOnServer("trackname_" + str(trackcounter), value="")
