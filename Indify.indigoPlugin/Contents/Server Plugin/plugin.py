@@ -82,7 +82,7 @@ def spotifyerror(htmlreturn):
         spotifyerror = "Spotify 503: Service Unavailable - The server is currently unable to handle the request due to a temporary condition which will be alleviated after some delay. You can choose to resend the request again."
         spotifylevel = "Error"
     else:  # default, could also just omit condition or 'if True'
-        spotifyerror = "Error code not found"
+        spotifyerror = "Error code not found: " + htmlreturn
         spotifylevel = "Warning"
 
     return {"errorlevel": spotifylevel, "errormessage": spotifyerror}
@@ -109,6 +109,13 @@ def callspotifycommand(callid, device, type, spotifyurl, spotifydata=None, spoti
             returncode = spotifyerror(str(response))
         except Exception as errtxt:
             indigo.server.log(callid + ".01: " + str(errtxt) + ":" + str(response))
+    elif type == "post":
+        try:
+            indigo.server.log(spotifyurl)
+            response = requests.post(spotifyurl, headers=spotifyheader, data=jsondata, params=spotifyparams, timeout=(3, 6))
+            returncode = spotifyerror(str(response))
+        except Exception as errtxt:
+            indigo.server.log(callid + ".01: " + str(errtxt) + ":" + str(response))
 
     if returncode["errorlevel"] == "Success":
         return(response.text)
@@ -123,6 +130,7 @@ def callspotifycommand(callid, device, type, spotifyurl, spotifydata=None, spoti
 def getspotifydevice(device):
     deviceid = "Device Not Found"
     restricted = "true"
+    deviceactive = "false"
     response = callspotifycommand("001", device, "get", "https://api.spotify.com/v1/me/player/devices")
 
     if response != "Error":
@@ -132,15 +140,13 @@ def getspotifydevice(device):
             if spotifydevices['name'] == spotifydevice:
                 deviceid = (spotifydevices['id'])
                 restricted = (spotifydevices['is_restricted'])
+                deviceactive = (spotifydevices['is_active'])
+
+    if deviceactive == "false":
+        deviceid = "Device Not Found"
+        device.updateStateOnServer("state", value="unavailable")
 
     return deviceid
-
-    #if str(restricted) == "true":
-        #return deviceid
-    #else:
-        #indigo.server.log("error 001.5: Device not available")
-        #device.updateStateOnServer("state", value="unavailable")
-        #return "Unavailable"
 
 #002
 def RefreshKey(device, refreshkey):
@@ -210,35 +216,36 @@ def UpdateCurrentSong(device, playingsong):
 
     try:
         if playingsong['isplaying']:
-            device.updateStateOnServer("state", "playing")
+            keyValueList = [{'key': 'state', 'value': 'playing'}]
             if not currenttrackid:
-                device.updateStateOnServer("c_album", value=playingsong['album'])
-                device.updateStateOnServer("c_track", value=playingsong['track'])
-                device.updateStateOnServer("c_artist", value=playingsong['artist'])
-                device.updateStateOnServer("c_track_id", value=playingsong['trackid'])
-                device.updateStateOnServer("c_album_id", value=playingsong['albumid'])
-                device.updateStateOnServer("c_artist_id", value=playingsong['artistid'])
-                device.updateStateOnServer("duration", value=playingsong['duration'])
+                keyValueList.append({'key': "c_album", 'value': playingsong['album']})
+                keyValueList.append({'key': "c_track", 'value': playingsong['track']})
+                keyValueList.append({'key': "c_artist", 'value': playingsong['artist']})
+                keyValueList.append({'key': "c_track_id", 'value': playingsong['trackid']})
+                keyValueList.append({'key': "c_album_id", 'value': playingsong['albumid']})
+                keyValueList.append({'key': "c_artist_id", 'value': playingsong['artistid']})
+                keyValueList.append({'key': "duration", 'value': playingsong['duration']})
             elif playingsong['trackid'] <> currenttrackid:
                 # update previous
-                device.updateStateOnServer("p_album", value=device.states['c_album'])
-                device.updateStateOnServer("p_track", value=device.states['c_track'])
-                device.updateStateOnServer("p_artist", value=device.states['c_artist'])
-                device.updateStateOnServer("p_track_id", value=device.states['c_track_id'])
-                device.updateStateOnServer("p_album_id", value=device.states['c_album_id'])
-                device.updateStateOnServer("p_artist_id", value=device.states['c_artist_id'])
+                keyValueList.append({'key': "p_album", 'value': device.states['c_album']})
+                keyValueList.append({'key': "p_track", 'value': device.states['c_track']})
+                keyValueList.append({'key': "p_artist", 'value': device.states['c_artist']})
+                keyValueList.append({'key': "p_track_id", 'value': device.states['c_track_id']})
+                keyValueList.append({'key': "p_album_id", 'value': device.states['c_album_id']})
+                keyValueList.append({'key': "p_artist_id", 'value': device.states['c_artist_id']})
                 # update current song
-                device.updateStateOnServer("c_album", value=playingsong['album'])
-                device.updateStateOnServer("c_track", value=playingsong['track'])
-                device.updateStateOnServer("c_artist", value=playingsong['artist'])
-                device.updateStateOnServer("c_track_id", value=playingsong['trackid'])
-                device.updateStateOnServer("c_album_id", value=playingsong['albumid'])
-                device.updateStateOnServer("c_artist_id", value=playingsong['artistid'])
-                device.updateStateOnServer("duration", value=playingsong['duration'])
+                keyValueList.append({'key': "c_album", 'value': playingsong['album']})
+                keyValueList.append({'key': "c_track", 'value': playingsong['track']})
+                keyValueList.append({'key': "c_artist", 'value': playingsong['artist']})
+                keyValueList.append({'key': "c_track_id", 'value': playingsong['trackid']})
+                keyValueList.append({'key': "c_album_id", 'value': playingsong['albumid']})
+                keyValueList.append({'key': "c_artist_id", 'value': playingsong['artistid']})
+                keyValueList.append({'key': "duration", 'value': playingsong['duration']})
                 # Update images
                 UpdateCurrentImage(playingsong['imagelarge'], playingsong['imagemedium'], playingsong['imagesmall'])
         else:
-            device.updateStateOnServer("state", "Paused")
+            keyValueList = [{'key': 'state', 'value': 'paused'}]
+        device.updateStatesOnServer(keyValueList)
     except Exception as errtxt:
         indigo.server.log('error 004: ' + str(errtxt))
 
@@ -298,7 +305,7 @@ def UpdateCurrentImage(large, medium, small):
         copyfile(smallimage1, smallimage2)
         os.remove(smallimage1)
     try:
-        SaveImage(smallimage1, small)
+        SaveImage("smallimage1", small)
     except Exception as errtxt:
         indigo.server.log('error 006.3: ' + str(errtxt))
 
@@ -317,22 +324,32 @@ def LoadPlayListPage(device, spotifykey, pagenumber, itemsperpage):
         data = json.loads(response)
         device.updateStateOnServer("totalplaylists", value=data['total'])
         maindirectory = "/Library/Application Support/Perceptive Automation/Indigo 7/IndigoWebServer/plugins/Indify/"
+        keyValueList = []
 
         if len(data['items']) > 0:
             for playlistcounter in range(1, 11):
-                device.updateStateOnServer("playlist_" + str(playlistcounter), value="")
-                device.updateStateOnServer("playlistid_" + str(playlistcounter), value="")
-                device.updateStateOnServer("playlistuser_" + str(playlistcounter), value="")
+                keyValueList.append({'key': 'playlist_' + str(playlistcounter), 'value': ''})
+            for playlistcounter in range(1, 11):
+                keyValueList.append({'key': 'playlistid_' + str(playlistcounter), 'value': ''})
+            for playlistcounter in range(1, 11):
+                keyValueList.append({'key': 'playlistuser_' + str(playlistcounter), 'value': ''})
                 oldplaylistimage = maindirectory + "playlistimage" + str(playlistcounter) + ".png"
                 copyfile("./Clear.jpg", oldplaylistimage)
 
             playlistcounter = 0
+            playlistidcounter = 10
+            playlistusercounter = 20
+
             for playlist in data['items']:
-                playlistcounter = playlistcounter + 1
-                device.updateStateOnServer("playlist_" + str(playlistcounter), value=playlist['name'])
-                device.updateStateOnServer("playlistid_" + str(playlistcounter), value=playlist['id'])
-                device.updateStateOnServer("playlistuser_" + str(playlistcounter), value=playlist['owner']['id'])
+                keyValueList[playlistcounter]['value'] = playlist['name']
+                keyValueList[playlistidcounter]['value'] = playlist['id']
+                keyValueList[playlistusercounter]['value'] = playlist['owner']['id']
+
                 playlistimages = playlist['images']
+
+                playlistcounter = playlistcounter + 1
+                playlistidcounter = playlistidcounter + 1
+                playlistusercounter = playlistusercounter + 1
 
                 if len(playlistimages) > 0:
 
@@ -346,7 +363,7 @@ def LoadPlayListPage(device, spotifykey, pagenumber, itemsperpage):
                     except Exception as errtxt:
                         indigo.server.log("007: No playlist image: " + str(errtxt))
 
-            device.updateStateOnServer("playlistpage", value=str(pagenumber))
+            device.updateStatesOnServer(keyValueList)
 
 #008
 def LoadPlaylistDetail(device, spotifykey, userid, playlistid):
@@ -364,9 +381,6 @@ def LoadPlaylistDetail(device, spotifykey, userid, playlistid):
 def GetUserName(spotifykey):
 
     response = callspotifycommand("009", device, "get", "https://api.spotify.com/v1/me", "", {"fields": "name,description,id"})
-    #spotifyurl = "https://api.spotify.com/v1/me"
-    #spotifyheader = {"Authorization": "Bearer " + spotifykey}
-    #response = requests.get(spotifyurl, headers=spotifyheader)
 
     if response != "Error":
         data = json.loads(response)
@@ -385,23 +399,28 @@ def LoadTrackPage(device, userid, playlistid, spotifykey, pagenumber, itemsperpa
     if response != "Error":
         data = json.loads(response)
         device.updateStateOnServer("totaltracks", value=data['total'])
+        keyValueList = []
 
         if len(data['items']) > 0:
             for trackcounter in range(1, 11):
-                device.updateStateOnServer("trackname_" + str(trackcounter), value="")
-                device.updateStateOnServer("trackartist_" + str(trackcounter), value="")
+                keyValueList.append({'key': 'trackname_' + str(trackcounter), 'value': ''})
+            for trackcounter in range(1, 11):
+                keyValueList.append({'key': 'trackartist_' + str(trackcounter), 'value': ''})
+
             trackcounter = 0
+            artistcounter = 10
             for tracks in data['items']:
                 trackname = tracks['track']['name']
-                indigo.server.log(str(trackcounter))
                 try:
                     artist = tracks['track']['album']['artists'][0]['name']
                 except Exception as errtxt:
                     artist = "Unknown"
+                keyValueList[trackcounter]['value']=trackname
+                keyValueList[artistcounter]['value']=artist
                 trackcounter = trackcounter + 1
-                device.updateStateOnServer("trackname_" + str(trackcounter), value=trackname)
-                device.updateStateOnServer("trackartist_" + str(trackcounter), value=artist)
-            device.updateStateOnServer("trackpage", value=str(pagenumber))
+                artistcounter = artistcounter + 1
+
+            device.updateStatesOnServer(keyValueList)
 
 #011
 def GetPlayerState(device, spotifykey):
@@ -512,36 +531,50 @@ class Plugin(indigo.PluginBase):
                         except Exception as errtxt:
                             indigo.server.log('error 85:' + str(errtxt))
 
+                        #indigo.server.log(str(playerstate))
+
                         if str(playerstate) != "False" and (str(playerstate['isplaying']) == "True"):
                             spotifydevice = playerstate['spotifydevice']
-                            device.updateStateOnServer("state", "playing")
+                            keyValueList = [{'key': 'state', 'value': 'playing'}]
+                            #device.updateStateOnServer("state", "playing")
 
                             #Check volume
                             if int(playerstate['spotifyvolume']) != int(device.states["volume"]):
-                                device.updateStateOnServer("volume", playerstate['spotifyvolume'])
+                                keyValueList.append({'key': 'volume', 'value': playerstate['spotifyvolume']})
+                                #device.updateStateOnServer("volume", playerstate['spotifyvolume'])
 
                             #Check repeat
                             if playerstate['repeat'] != device.states["repeat"]:
                                 if device.states["repeat"] == "off":
-                                    device.updateStateOnServer("repeat", value="context")
+                                    keyValueList.append({'key': 'repeat', 'value': 'context'})
+                                    #device.updateStateOnServer("repeat", value="context")
                                 else:
-                                    device.updateStateOnServer("repeat", value="off")
+                                    keyValueList.append({'key': 'repeat', 'value': 'off'})
+                                    #device.updateStateOnServer("repeat", value="off")
 
                             #Check shuffle
                             if str(playerstate['shuffle']) != str(device.states["shuffle"]):
                                 if str(device.states["shuffle"]) == "False":
-                                    device.updateStateOnServer("shuffle", value="True")
+                                    keyValueList.append({'key': 'shuffle', 'value': 'True'})
+                                    #device.updateStateOnServer("shuffle", value="True")
                                 else:
-                                    device.updateStateOnServer("shuffle", value="False")
+                                    keyValueList.append({'key': 'shuffle', 'value': 'False'})
+                                    #device.updateStateOnServer("shuffle", value="False")
 
                             #Update song information
                             playingsong = GetCurrentSong(device, spotifykey)
                             timeremaining = playingsong['duration'] - playingsong['progress']
                             consec, conmin = convertms(playingsong['duration'])
-                            device.updateStateOnServer("durationtext", value=str(conmin) + ":" + str(consec).zfill(2))
+                            #device.updateStateOnServer("durationtext", value=str(conmin) + ":" + str(consec).zfill(2))
+                            keyValueList.append({'key': 'durationtext', 'value': str(conmin) + ":" + str(consec).zfill(2)})
+                            #indigo.server.log(str(keyValueList))
+                            device.updateStatesOnServer(keyValueList)
 
                             if playingsong['track'] != device.states["c_track"]:
                                 UpdateCurrentSong(device, playingsong)
+                        else:
+                            if getspotifydevice(device) != "Device Not Found":
+                                device.updateStateOnServer("state", value="paused")
 
                     self.sleep(1)
 
@@ -617,17 +650,16 @@ class Plugin(indigo.PluginBase):
     def next(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
         state = device.states["state"]
+        indigo.server.log("next")
         if state == "playing":
-            spotifyurl = "https://api.spotify.com/v1/me/player/next"
-            response = callspotifycommand("018", device, "put", "https://api.spotify.com/v1/me/player/next")
+            response = callspotifycommand("018", device, "post", "https://api.spotify.com/v1/me/player/next")
 
     #019
     def previous(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
         state = device.states["state"]
         if state == "playing":
-            spotifyurl = "https://api.spotify.com/v1/me/player/next"
-            response = callspotifycommand("019", device, "put", "https://api.spotify.com/v1/me/player/previous")
+            response = callspotifycommand("019", device, "post", "https://api.spotify.com/v1/me/player/previous")
 
     def repeat(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
