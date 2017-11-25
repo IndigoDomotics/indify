@@ -12,7 +12,6 @@
 			</Field>
 
 			<Field id="validatespotify" type="button">
-				<Label></Label>
 				<Title>Validate Spotify ID</Title>
 				<CallbackMethod>validatespotifyid</CallbackMethod>
 			</Field>
@@ -20,6 +19,12 @@
 			<Field id="SpotifyDevice" type="menu">
 				<Label>Device:</Label>
 				<List class="self" method="getspotifydevices" dynamicReload="true"/>
+			</Field>
+
+			<Field id="LoggingSection" type="separator"/>
+
+			<Field type="checkbox" id="verboselogging" defaultValue="true">
+				<Label>Verbose Logging:</Label>
 			</Field>
 
 			<Field type="menu" id="PlaylistsPerPage" defaultValue="10">
@@ -76,6 +81,16 @@
 				<ValueType>Number</ValueType>
 				<TriggerLabel>Volume</TriggerLabel>
 				<ControlPageLabel>Volume</ControlPageLabel>
+			</State>
+			<State id="context1">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Context Line 1</TriggerLabel>
+				<ControlPageLabel>Context Line 1</ControlPageLabel>
+			</State>
+			<State id="context2">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Context Line 2</TriggerLabel>
+				<ControlPageLabel>Context Line 2</ControlPageLabel>
 			</State>
 
 
