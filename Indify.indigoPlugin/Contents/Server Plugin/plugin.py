@@ -91,6 +91,7 @@ def callspotifycommand(callid, device, type, spotifyurl, spotifydata=None, spoti
     spotifydata = spotifydata if spotifydata else {}
     spotifyparams = spotifyparams if spotifyparams else {}
     spotifykey = device.pluginProps["SpotifyKey"]
+    verboselogging = device.pluginProps["verboselogging"]
 
     spotifyheader = {"Authorization": "Bearer " + spotifykey}
     jsondata = json.dumps(spotifydata)
@@ -123,7 +124,8 @@ def callspotifycommand(callid, device, type, spotifyurl, spotifydata=None, spoti
         refreshkey = device.pluginProps["RefreshKey"]
         RefreshKey(device, refreshkey)
     else:
-        indigo.server.log(callid + ".02: " + returncode["errormessage"])
+        if str(verboselogging) == "True":
+            indigo.server.log(callid + ".02: " + returncode["errormessage"])
         return("Error")
 
 #001
@@ -391,7 +393,7 @@ def LoadTrackPage(device, userid, playlistid, spotifykey, pagenumber, itemsperpa
 
     if pagenumber < 1:
         pagenumber = 1
-    trackpage = ((pagenumber - 1) * itemsperpage) + 1
+    trackpage = ((pagenumber - 1) * itemsperpage)
     trackcounter = 0
 
     response = callspotifycommand("010", device, "get", "https://api.spotify.com/v1/users/" + userid + "/playlists/" + playlistid + "/tracks", "", {'limit': itemsperpage, 'offset': trackpage})
@@ -412,7 +414,7 @@ def LoadTrackPage(device, userid, playlistid, spotifykey, pagenumber, itemsperpa
             for tracks in data['items']:
                 trackname = tracks['track']['name']
                 try:
-                    artist = tracks['track']['album']['artists'][0]['name']
+                    artist = tracks['track']['artists'][0]['name']
                 except Exception as errtxt:
                     artist = "Unknown"
                 keyValueList[trackcounter]['value']=trackname
@@ -434,7 +436,9 @@ def GetPlayerState(device, spotifykey):
                 'repeat':data['repeat_state'],
                 'spotifydevice':data['device']['id'],
                 'spotifydevicename':data['device']['name'],
-                'spotifyvolume': data['device']['volume_percent']}
+                'spotifyvolume': data['device']['volume_percent'],
+                'spotifycontexttype': data['context']['type'],
+                'spotifycontexturi': data['context']['uri']}
     else:
         return "False"
 
@@ -461,6 +465,34 @@ def SetVolume(device, spotifykey, newvolume):
     #spotifyparam ={"volume_percent": newvolume}
     #response = requests.put(spotifyurl, headers=spotifyheader, params=spotifyparam)
     response = callspotifycommand("014", device, "put", "https://api.spotify.com/v1/me/player/volume", "", {"volume_percent": newvolume})
+
+#008
+def GetContextDetail(device, type, spotifykey, contextmeta):
+
+    if type == "playlist":
+        userid = contextmeta[2]
+        id = contextmeta[4]
+        response = callspotifycommand("008", device, "get", "https://api.spotify.com/v1/users/" + userid + "/playlists/" + id, "", {"fields": "name,description,id"})
+        if response != "Error":
+            data = json.loads(response)
+            device.updateStateOnServer("context1", value=data['name'])
+            device.updateStateOnServer("context2", value=data['description'])
+    elif type == "artist":
+        id = contextmeta[2]
+        response = callspotifycommand("008", device, "get", "https://api.spotify.com/v1/artists/" + id)
+        if response != "Error":
+            data = json.loads(response)
+            device.updateStateOnServer("context1", value=data['name'])
+            device.updateStateOnServer("context2", value='')
+    elif type == "album":
+        id = contextmeta[2]
+        response = callspotifycommand("008", device, "get", "https://api.spotify.com/v1/albums/" + id)
+        if response != "Error":
+            data = json.loads(response)
+            device.updateStateOnServer("context1", value=data['name'] + " (" + data['release_date'] + ")")
+            device.updateStateOnServer("context2", value=data['artists'][0]['name'])
+    else:
+        indigo.server.log("Not implemented yet")
 
 ########################################
 class Plugin(indigo.PluginBase):
@@ -538,6 +570,14 @@ class Plugin(indigo.PluginBase):
                             keyValueList = [{'key': 'state', 'value': 'playing'}]
                             #device.updateStateOnServer("state", "playing")
 
+                            contextmeta = playerstate['spotifycontexturi'].split(":")
+                            #indigo.server.log(playlistmeta[2])
+                            #indigo.server.log(playlistmeta[4])
+                            #indigo.server.log(str(contextmeta))
+                            #indigo.server.log(playerstate['spotifycontexttype'])
+
+                            GetContextDetail(device, playerstate['spotifycontexttype'], spotifykey, contextmeta)
+
                             #Check volume
                             if int(playerstate['spotifyvolume']) != int(device.states["volume"]):
                                 keyValueList.append({'key': 'volume', 'value': playerstate['spotifyvolume']})
@@ -590,20 +630,20 @@ class Plugin(indigo.PluginBase):
         ActiveVersion = str(self.pluginVersion)
         CurrentVersion = str(self.updater.getVersion())
         if ActiveVersion == CurrentVersion:
-            indigo.server.log("Running the most recent version of Indyfy")
+            indigo.server.log("Running the most recent version of Indify")
         else:
             indigo.server.log(
-                "The current version of Indyfy is " + str(CurrentVersion) + " and the running version " + str(
+                "The current version of Indify is " + str(CurrentVersion) + " and the running version " + str(
                     ActiveVersion) + ".")
 
     def updatePlugin(self):
         ActiveVersion = str(self.pluginVersion)
         CurrentVersion = str(self.updater.getVersion())
         if ActiveVersion == CurrentVersion:
-            indigo.server.log("Already running the most recent version of Indyfy")
+            indigo.server.log("Already running the most recent version of Indify")
         else:
             indigo.server.log(
-                "The current version of Indyfy is " + str(CurrentVersion) + " and the running version " + str(
+                "The current version of Indify is " + str(CurrentVersion) + " and the running version " + str(
                     ActiveVersion) + ".")
             self.updater.update()
 
@@ -650,7 +690,6 @@ class Plugin(indigo.PluginBase):
     def next(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
         state = device.states["state"]
-        indigo.server.log("next")
         if state == "playing":
             response = callspotifycommand("018", device, "post", "https://api.spotify.com/v1/me/player/next")
 
@@ -660,6 +699,13 @@ class Plugin(indigo.PluginBase):
         state = device.states["state"]
         if state == "playing":
             response = callspotifycommand("019", device, "post", "https://api.spotify.com/v1/me/player/previous")
+
+    #020
+    def playuri(self, pluginAction):
+        device = indigo.devices[pluginAction.deviceId]
+        spotifyuri = pluginAction.props["spotifyuri"]
+        uribody = {"context_uri": spotifyuri}
+        response = callspotifycommand("020", device, "put", "https://api.spotify.com/v1/me/player/play", uribody)
 
     def repeat(self, pluginAction):
         device = indigo.devices[pluginAction.deviceId]
