@@ -82,7 +82,7 @@
 				<TriggerLabel>Volume</TriggerLabel>
 				<ControlPageLabel>Volume</ControlPageLabel>
 			</State>
-			
+
 			<State id="context1">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Context Line 1</TriggerLabel>
