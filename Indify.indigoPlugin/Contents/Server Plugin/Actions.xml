@@ -21,6 +21,9 @@
 		<Name>Previous Track</Name>
 		<CallbackMethod>previous</CallbackMethod>
 	</Action>
+
+	<Action id="PlayerSetting" />
+
 	<Action id="repeat" deviceFilter="self">
 		<Name>Repeat Tracks</Name>
 		<CallbackMethod>repeat</CallbackMethod>
@@ -29,7 +32,6 @@
 		<Name>Shuffle Tracks</Name>
 		<CallbackMethod>shuffle</CallbackMethod>
 	</Action>
-
 	<Action id="setvolume" deviceFilter="self">
 		<Name>Set Volume</Name>
 		<ConfigUI>
@@ -57,6 +59,45 @@
 		</ConfigUI>
 		<CallbackMethod>decreasevolume</CallbackMethod>
 	</Action>
+
+	<Action id="PlayerStuff" />
+
+	<Action id="playselectedplaylist" deviceFilter="self">
+		<Name>Play Selected Playlist</Name>
+		<CallbackMethod>playselectedplaylist</CallbackMethod>
+	</Action>
+	<Action id="playuri" deviceFilter="self">
+		<Name>Play Spotify URI</Name>
+		<ConfigUI>
+			<Field id="spotifyuri" type="textfield" defaultValue="">
+				<Label>Spotify URI:</Label>
+			</Field>
+		</ConfigUI>
+		<CallbackMethod>playuri</CallbackMethod>
+	</Action>
+	<Action id="playplaylist" deviceFilter="self">
+		<Name>Play Playlist</Name>
+		<ConfigUI>
+			<Field id="PlaySelectedPlaylist" type="menu">
+				<Label>Play Playlist:</Label>
+				<List>
+					<Option value="01">Playlist 1</Option>
+					<Option value="02">Playlist 2</Option>
+					<Option value="03">Playlist 3</Option>
+					<Option value="04">Playlist 4</Option>
+					<Option value="05">Playlist 5</Option>
+					<Option value="06">Playlist 6</Option>
+					<Option value="07">Playlist 7</Option>
+					<Option value="08">Playlist 8</Option>
+					<Option value="09">Playlist 9</Option>
+					<Option value="10">Playlist 10</Option>
+				</List>
+			</Field>
+		</ConfigUI>
+		<CallbackMethod>playplaylist</CallbackMethod>
+	</Action>
+
+	<Action id="PlaylistsPages" />
 
 	<Action id="loadplaylistpage" deviceFilter="self">
 		<Name>Load Playlist Page</Name>
@@ -97,6 +138,9 @@
 		</ConfigUI>
 		<CallbackMethod>selectplaylist</CallbackMethod>
 	</Action>
+
+	<Action id="TrackPages" />
+
 	<Action id="loadtracklist" deviceFilter="self">
 		<Name>Load Playlist Tracks</Name>
 		<ConfigUI>
@@ -114,31 +158,5 @@
 		<Name>Previous Tracks Page</Name>
 		<CallbackMethod>previoustrackspage</CallbackMethod>
 	</Action>
-	<Action id="playselectedplaylist" deviceFilter="self">
-		<Name>Play Selected Playlist</Name>
-		<CallbackMethod>playselectedplaylist</CallbackMethod>
-	</Action>
 
-
-	<Action id="playplaylist" deviceFilter="self">
-		<Name>Play Playlist</Name>
-		<ConfigUI>
-			<Field id="PlaySelectedPlaylist" type="menu">
-				<Label>Play Playlist:</Label>
-				<List>
-					<Option value="01">Playlist 1</Option>
-					<Option value="02">Playlist 2</Option>
-					<Option value="03">Playlist 3</Option>
-					<Option value="04">Playlist 4</Option>
-					<Option value="05">Playlist 5</Option>
-					<Option value="06">Playlist 6</Option>
-					<Option value="07">Playlist 7</Option>
-					<Option value="08">Playlist 8</Option>
-					<Option value="09">Playlist 9</Option>
-					<Option value="10">Playlist 10</Option>
-				</List>
-			</Field>
-		</ConfigUI>
-		<CallbackMethod>playplaylist</CallbackMethod>
-	</Action>
 </Actions>

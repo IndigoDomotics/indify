@@ -82,6 +82,7 @@
 				<TriggerLabel>Volume</TriggerLabel>
 				<ControlPageLabel>Volume</ControlPageLabel>
 			</State>
+			
 			<State id="context1">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Context Line 1</TriggerLabel>
@@ -487,8 +488,6 @@
 				<TriggerLabel>Playlist id 10</TriggerLabel>
 				<ControlPageLabel>Playlist id 10</ControlPageLabel>
 			</State>
-
-
 
 		</States>
 		<UiDisplayStateId>state</UiDisplayStateId>
