@@ -430,7 +430,6 @@ def GetPlayerState(device, spotifykey):
 
     if response != "Error":
         data = json.loads(response)
-
         return {'isplaying':data['is_playing'],
                 'shuffle':data['shuffle_state'],
                 'repeat':data['repeat_state'],
@@ -564,8 +563,9 @@ class Plugin(indigo.PluginBase):
                             indigo.server.log('error 85:' + str(errtxt))
 
                         #indigo.server.log(str(playerstate))
-
-                        if str(playerstate) != "False" and (str(playerstate['isplaying']) == "True"):
+                        #indigo.server.log("A:" + getspotifydevice(device))
+                        #indigo.server.log("1:" + str(playerstate['isplaying']))
+                        if getspotifydevice(device) != "Device Not Found" and str(playerstate) != "False" and (str(playerstate['isplaying']) == "True"):
                             spotifydevice = playerstate['spotifydevice']
                             keyValueList = [{'key': 'state', 'value': 'playing'}]
                             #device.updateStateOnServer("state", "playing")
@@ -603,15 +603,15 @@ class Plugin(indigo.PluginBase):
 
                             #Update song information
                             playingsong = GetCurrentSong(device, spotifykey)
-                            timeremaining = playingsong['duration'] - playingsong['progress']
-                            consec, conmin = convertms(playingsong['duration'])
-                            #device.updateStateOnServer("durationtext", value=str(conmin) + ":" + str(consec).zfill(2))
-                            keyValueList.append({'key': 'durationtext', 'value': str(conmin) + ":" + str(consec).zfill(2)})
-                            #indigo.server.log(str(keyValueList))
+                            if playingsong != False:
+                                timeremaining = playingsong['duration'] - playingsong['progress']
+                                consec, conmin = convertms(playingsong['duration'])
+                                keyValueList.append({'key': 'durationtext', 'value': str(conmin) + ":" + str(consec).zfill(2)})
+                                if playingsong['track'] != device.states["c_track"]:
+                                    UpdateCurrentSong(device, playingsong)
+
                             device.updateStatesOnServer(keyValueList)
 
-                            if playingsong['track'] != device.states["c_track"]:
-                                UpdateCurrentSong(device, playingsong)
                         else:
                             if getspotifydevice(device) != "Device Not Found":
                                 device.updateStateOnServer("state", value="paused")
@@ -649,6 +649,7 @@ class Plugin(indigo.PluginBase):
 
     def RefreshKey(self):
         indigo.server.log("?? Refresh Key")
+        #RefreshKey(device, refreshkey)
 
     ############################################################################
     # Plugin Actions object callbacks
