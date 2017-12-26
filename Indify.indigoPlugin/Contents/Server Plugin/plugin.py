@@ -108,7 +108,7 @@ def callspotifycommand(logger, callid, device, type, spotifyurl, spotifydata=Non
     returncode = {"errorlevel": "Failed", "errormessage": "Undefined Error"}
     response = ""
 
-    logger.debug("calling:" + spotifyurl)
+    logger.debug("calling: " + callid + " : " + spotifyurl)
 
     if type == "get":
         try:
@@ -577,7 +577,7 @@ class Plugin(indigo.PluginBase):
                         try:
                             playerstate = GetPlayerState(self.logger, device, spotifykey)
                         except Exception as errtxt:
-                            self.log.debug("error 85:" + str(errtxt))
+                            self.logger.debug("error 85:" + str(errtxt))
 
                         #indigo.server.log(str(playerstate))
                         #indigo.server.log("A:" + getspotifydevice(device))
@@ -631,7 +631,7 @@ class Plugin(indigo.PluginBase):
                             device.updateStatesOnServer(keyValueList)
 
                         else:
-                            if getspotifydevice(logger, device) != "Device Not Found":
+                            if getspotifydevice(self.logger, device) != "Device Not Found":
                                 device.updateStateOnServer("state", value="paused")
 
                     self.sleep(1)
