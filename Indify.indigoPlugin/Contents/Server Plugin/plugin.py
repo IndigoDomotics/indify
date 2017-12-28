@@ -205,7 +205,8 @@ def GetCurrentSong(logger, device, spotifykey):
             imagemedium = album['images'][1]
             imagesmall = album['images'][2]
 
-            return {'isplaying': data['is_playing'],
+            return {'result': 'True',
+                    'isplaying': data['is_playing'],
                     'track': data['item']['name'],
                     'trackid': data['item']['id'],
                     'duration': data['item']['duration_ms'],
@@ -221,7 +222,7 @@ def GetCurrentSong(logger, device, spotifykey):
         except Exception as errtxt:
             logger.debug('error 003.1: ' + str(errtxt) + ":" + str(response))
     else:
-        return False
+        return {'result': 'False'}
 
 #004
 def UpdateCurrentSong(logger, device, playingsong):
@@ -621,12 +622,14 @@ class Plugin(indigo.PluginBase):
 
                             #Update song information
                             playingsong = GetCurrentSong(self.logger, device, spotifykey)
-                            if playingsong != False:
+                            if playingsong['result'] != "False":
                                 timeremaining = playingsong['duration'] - playingsong['progress']
                                 consec, conmin = convertms(playingsong['duration'])
                                 keyValueList.append({'key': 'durationtext', 'value': str(conmin) + ":" + str(consec).zfill(2)})
                                 if playingsong['track'] != device.states["c_track"]:
                                     UpdateCurrentSong(self.logger, device, playingsong)
+                            else:
+                                self.logger.debug(u"Get playing song failed")
 
                             device.updateStatesOnServer(keyValueList)
 
